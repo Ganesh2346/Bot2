@@ -1,18 +1,18 @@
 import openai
 import streamlit as st
 
-# Set your OpenAI API key
-openai.api_key = st.secretS[OPENAI_API KEY"]
+# Access the API key from Streamlit secrets
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Function to generate text with continuous stream
 def generate_text(prompt):
     # Initialize an empty string for the response
     response_text = ""
 
-    # Start the chat message display
-    chat_message = st.chat_message("bot", "Thinking...")
+    # Create a placeholder to update the message progressively
+    chat_placeholder = st.empty()
 
-    # Simulate streaming response by breaking response into chunks
+    # Stream the response from the API
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -27,20 +27,7 @@ def generate_text(prompt):
     for chunk in response:
         # Extract and append the latest part of the response
         response_text += chunk['choices'][0]['delta'].get('content', '')
-        chat_message.update(response_text)
+        chat_placeholder.write(response_text)
 
     # Return final response text
     return response_text
-
-# Streamlit UI setup
-st.title("Paralympics 2024 Chatbot")
-st.write("Ask me anything about India's performance in the 2024 Paralympics!")
-
-# User input
-user_input = st.text_input("You:", placeholder="Type your question here...")
-
-# If there's a user input, get the response from the chatbot
-if user_input:
-    st.chat_message("user", user_input)
-    generate_text(user_input)
-
